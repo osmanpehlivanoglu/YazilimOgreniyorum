@@ -6,38 +6,35 @@ require('dotenv').config()
 
 const port = process.env.PORT || 3000
 
+app.use(express.json())
+
+const Book = require('./models/Book')
+
+// 
+
 app.get('/', (req, res) => {
-
-    console.log(req.method)
-    console.log(req.url)
-
     res.status(201).send("hello world")
 })
 
 
-app.get('/products', (req, res) => {
-    console.log(req.url)
+app.post('/books', async (req, res) => {
 
-    res.send("merhaba")
-})
+    console.log(req.body);
 
+    const newBook = { title: req.body.title, author: req.body.author }
+    console.log(newBook);
 
-app.get('/products/:id', (req, res) => {
-    console.log(req.url);
-    console.log(req.params);
-
-    res.send("seçili ürünün id si:  " + req.params.id)
+    const book = await Book.create(newBook)
+    return res.status(201).send({ message: "Başarılı", data: book })
 
 })
 
 
 mongoose.connect(process.env.MONGO_URI)
     .then(
-
         app.listen(port, () => {
             console.log("sunucu çalışmaya başladı....." + port);
         })
-
     )
     .catch((error) => {
         console.log(error);
