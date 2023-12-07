@@ -14,14 +14,12 @@ const Book = require('./models/Book')
 
 app.get('/', (req, res) => {
     try {
-
         res.status(201).send("hello world")
 
     } catch (error) {
         return res.status(500).send({ message: error.message })
     }
 })
-
 
 
 app.post('/books', async (req, res) => {
@@ -70,8 +68,11 @@ app.get('/books/:id', async (req, res) => {
     try {
 
         const book = await Book.findById(id)
-        return res.status(201).send({ message: "Başarılı", data: book })
+        if (!book) {
+            return res.status(404).send({ message: "Kitap bulunamadı" })
+        }
 
+        return res.status(201).send({ message: "Başarılı", data: book })
 
     } catch (error) {
 
@@ -80,6 +81,58 @@ app.get('/books/:id', async (req, res) => {
     }
 
 })
+
+
+// put tüm alanlar güncelleniyor
+// patch bazı alanlar için
+
+
+app.put('/books/:id', async (req, res) => {
+
+    const { id } = req.params
+
+    console.log(id);
+    console.log(req.body);
+
+    try {
+
+        const book = await Book.findByIdAndUpdate(id, req.body)
+
+        if (!book) {
+            return res.status(404).send({ message: "Kitap bulunamadı" })
+        }
+
+        const updatedBook = await Book.findById(id)
+        return res.status(201).send({ message: "Başarılı", data: updatedBook })
+
+    } catch (error) {
+
+        return res.status(500).send({ message: error.message })
+
+    }
+
+})
+
+app.delete('/books/:id', async (req, res) => {
+
+    const { id } = req.params
+
+    try {
+
+        const book = await Book.findByIdAndDelete(id)
+        if (!book) {
+            return res.status(404).send({ message: "Kitap bulunamadı" })
+        }
+        return res.status(201).send({ message: "Başarılı", data: book })
+
+    } catch (error) {
+
+        return res.status(500).send({ message: error.message })
+
+    }
+
+})
+
 
 
 mongoose.connect(process.env.MONGO_URI)
