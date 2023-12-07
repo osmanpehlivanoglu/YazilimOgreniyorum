@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const mongoose = require('mongoose')
+const connect = require('./db/connect_mongoose')
 
 require('dotenv').config()
 
@@ -133,15 +133,15 @@ app.delete('/books/:id', async (req, res) => {
 
 })
 
-
-
-mongoose.connect(process.env.MONGO_URI)
-    .then(
+const start = async () => {
+    try {
+        await connect(process.env.MONGO_URI);
         app.listen(port, () => {
             console.log("sunucu çalışmaya başladı....." + port);
         })
-    )
-    .catch((error) => {
+    } catch (error) {
         console.log(error);
-    })
+    }
+}
 
+start()
