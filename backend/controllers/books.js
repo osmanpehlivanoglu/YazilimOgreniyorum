@@ -1,8 +1,21 @@
 const Book = require('../models/Book')
 
 const getAllBooks = async (req, res) => {
+    //ÖDEV EKSTRALAR
+    //barkod, yayınevi, stok, fiyat  ---required
+    //ekstra kısıtlar --istediğiniz özelliklere ekleyin --max karakter vs.
 
-    const books = await Book.find({});
+
+    //skip - atla demek
+    //limit - şu kadar göster demek
+    //query ile page ve limit alıp skip bunlarla hesaplatılıyor
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || 10
+    const skip = (page - 1) * limit
+
+    console.log({ sayfa: page, limit: limit, atla: skip });
+
+    const books = await Book.find({}).skip(skip).limit(limit);
     return res.status(201).send({ message: "Başarılı", data: books, count: books.length })
 
 }
