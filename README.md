@@ -6,7 +6,7 @@ Yolculuğumuz burada bitmeyecek, çünkü kitapçımızı hayata geçirmek için
 
 ## Bu Proje Hakkında
 
-Kitapçı Projesi, hevesli yazılım geliştiriciler için pratik bir öğrenme deneyimi olarak tasarlandı. 
+Kitap Dükkanı Projesi, hevesli yazılım geliştiriciler için pratik bir öğrenme deneyimi olarak tasarlandı. 
 Gerçek bir dünya kitapçısını modelleyen işlevsel bir web uygulaması inşa ediyoruz. Bu proje şunları kapsar:
 
 - Node.js ve Express ile arka uç geliştirme
