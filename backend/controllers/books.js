@@ -60,12 +60,23 @@ const addBook = async (req, res) => {
     const newBook = {
         title: req.body.title,
         author: req.body.author,
-        publishYear: req.body.publishYear,
+        description: req.body.description,
+        category: req.body.category,
+        language: req.body.language,
+        publicationDate: req.body.publicationDate,
+        edition: req.body.edition,
+        placeOfPublication: req.body.placeOfPublication,
+        width: req.body.width,
+        height: req.body.height,
+        pageCount: req.body.pageCount,
+        coverType: req.body.coverType,
+        paperType: req.body.paperType,
         barcode: req.body.barcode,
         stock: req.body.stock,
         price: req.body.price,
-        isPublish: req.body.isPublish,
-    }
+        image: req.body.image
+    };
+
     const book = await Book.create(newBook)
     return res.status(201).send({ message: "Başarılı", data: book })
 
