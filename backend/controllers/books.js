@@ -1,46 +1,78 @@
 const Book = require('../models/Book')
 
+var jwt = require('jsonwebtoken');
+
+
+
+
 const getAllBooks = async (req, res) => {
-
-    console.log(req.query);
-
-    // barcode, title, author, publishYear, stock, price, isPublish
-
-
-    // kullanıcın querylerini değişkenlerimize atama
-    const { author, title, publishYear } = req.query
-    const queryObjem = {}
-
-    if (author) {
-        queryObjem.author = author;
-        // queryObjem.selamlama = "naber?"
-    }
+    const { title, author, sort, fields, numericFilters } = req.query;
+    const newQuery = {};
 
     if (title) {
-        //türkçe karakterlerde sıkıntı yaşamayalım diye
-        let modifiedTitle = title.toLocaleLowerCase().replace(/i/gi, '[iİ]').replace(/ı/gi, '[ıI]');
-        //kelime kelime aratabilmek için regex kullandık
-        queryObjem.title = { $regex: modifiedTitle, $options: 'i' };
+        newQuery.title = replaceTurkishChars(title);
     }
 
-    console.log(queryObjem);
+    if (author) {
+        newQuery.author = replaceTurkishChars(author);
+    }
 
-    const books = await Book.find(queryObjem)
+    if (numericFilters) {
+        const operatorMap = {
+            ">": "$gt",
+            ">=": "$gte",
+            "=": "$eq",
+            "!=": "$ne", // ayriyeten not equal comparator'unu ekledim
+            "<": "$lt",
+            "<=": "$lte",
+        };
+        const regexStr = /\b(<|>|>=|=|<|<=|!=)\b/g;
+        let filters = numericFilters.replace(
+            regexStr,
+            (match) => `-${operatorMap[match]}-`,
+        );
+        const options = ["price", "stock", "edition"];
 
+        filters = filters.split(",");
 
-    //skip - atla demek
-    //limit - şu kadar göster demek
-    //query ile page ve limit alıp skip bunlarla hesaplatılıyor
-    /* const page = Number(req.query.page) || 1
-    const limit = Number(req.query.limit) || 10
-    const skip = (page - 1) * limit
+        for (const item of filters) {
+            const [field, operator, value] = item.split("-");
+            if (options.includes(field)) {
+                newQuery[field] = { [operator]: Number(value) };
+            }
+        }
+    }
 
-    console.log({ sayfa: page, limit: limit, atla: skip });
+    console.log("şu ana kadar oluşturulan obje: ", newQuery);
 
-    const books = await Book.find({}).skip(skip).limit(limit); */
-    return res.status(201).send({ message: "Başarılı", data: books, count: books.length })
+    let result = Book.find(newQuery);
 
-}
+    if (sort) {
+        const sortList = sort.split(",").join(" ");
+        result = result.sort(sortList);
+    } else {
+        result = result.sort("dateAdded");
+    }
+
+    if (fields) {
+        const fieldsList = fields.split(",").join(" ");
+        result.select(fieldsList);
+    }
+
+    const page = Number(req.query.params) || 1;
+    const limit = Number(req.query.params) || 99;
+    const skipCount = (page - 1) * limit;
+
+    result = result.skip(skipCount).limit(limit);
+
+    const allBooks = await result;
+
+    console.log(result);
+
+    return res
+        .status(200)
+        .json({ "Bütün kitapların sayısı": allBooks.length, Kitaplar: allBooks });
+};
 
 const getBook = async (req, res) => {
 
@@ -108,4 +140,24 @@ const deleteBook = async (req, res) => {
 
 }
 
-module.exports = { getAllBooks, getBook, addBook, updateBook, deleteBook }
+const login = async (req, res) => {
+    console.log("merhaba");
+    const id = 99
+
+    const secret = process.env.JWT_SECRET
+
+    const email = req.body.email
+    const token = jwt.sign({ id, email }, secret, { expiresIn: '1d' })
+
+    return res.status(201).send({ message: "Başarılı", data: token })
+
+}
+
+const cokGizli = async (req, res) => {
+
+    return res.status(201).send({ message: "Başarılı", data: req.yasir })
+}
+
+
+
+module.exports = { getAllBooks, getBook, addBook, updateBook, deleteBook, login, cokGizli }

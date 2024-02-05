@@ -1,7 +1,9 @@
 const express = require('express')
 const router = express.Router()
 
-const { getAllBooks, getBook, addBook, updateBook, deleteBook } = require('../controllers/books')
+const authenticationMiddleware = require('../middleware/auth')
+
+const { getAllBooks, getBook, addBook, updateBook, deleteBook, login, cokGizli } = require('../controllers/books')
 
 /* router.get('/', getAllBooks)
 router.post('/', addBook)
@@ -11,6 +13,10 @@ router.delete('/:id', deleteBook) */
 
 
 router.route('/').get(getAllBooks).post(addBook)
+router.route('/bilgilerim').get(authenticationMiddleware, cokGizli)
 router.route('/:id').get(getBook).put(updateBook).delete(deleteBook)
+
+router.route('/giris').post(login)
+
 
 module.exports = router
