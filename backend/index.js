@@ -2,7 +2,10 @@ const express = require('express')
 require('express-async-errors')
 const app = express()
 const connect = require('./db/connect_mongoose')
-const books = require('./routes/books')
+
+const bookRoutes = require('./routes/books')
+const authRoutes = require('./routes/auth')
+
 const notFound = require('./middleware/not-found')
 const errorHandler = require('./middleware/error-handler')
 
@@ -14,7 +17,8 @@ const port = process.env.PORT || 3000
 
 // middleware
 app.use(express.json())
-app.use('/api/v1/books', books)
+app.use('/api/v1/books', bookRoutes)
+app.use('/api/v1/auth', authRoutes)
 app.use(errorHandler)
 app.use(notFound)
 

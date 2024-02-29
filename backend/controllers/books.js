@@ -3,6 +3,11 @@ const Book = require('../models/Book')
 var jwt = require('jsonwebtoken');
 
 
+const replaceTurkishChars = (fieldValue) => {
+    return fieldValue.toLocaleLowerCase()
+        .replace(/i/gi, '[iİ]')
+        .replace(/ı/gi, '[ıI]');
+};
 
 
 const getAllBooks = async (req, res) => {
